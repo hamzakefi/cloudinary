@@ -34,7 +34,7 @@ const FoodCard = ({food}) => {
         </Typography>
         </CardContent>
         <CardActions>
-          <Button size="small" variant="contained" color="success" onClick={()=> navigate(`/EditContact/${food._id}`)} >Edit</Button>
+          <Button size="small" variant="contained" color="success" onClick={()=> navigate(`/EditFood/${food._id}`)} >Edit</Button>
           {isAdmin === true ? 
             <Button size="small" color="error" variant="contained" onClick={()=>dispatch(deleteFood(food._id))} >Delete <DeleteOutlineIcon sx={{color : "white"}}/> </Button> :
             null

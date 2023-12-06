@@ -17,7 +17,7 @@ const EditFood = () => {
   const foodToGet = useSelector(
     (state) => state.foodReducer.foodToGet
   );
-  const load = useSelector((state) => state.contactReducer.load);
+  const load = useSelector((state) => state.foodReducer.load);
 
   const handleChange = (e) => {
     setNewFood({ ...newFood, [e.target.name]: e.target.value});
