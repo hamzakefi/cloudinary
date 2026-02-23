@@ -10,7 +10,7 @@ const router = express.Router()
 //     res.send("api is running")
 // })
 
-router.post("/add-food" ,[isAuth,isAdmin],upload.single("image"), async(req,res) =>{
+router.post("/add-food" ,[isAuth],upload.single("image"), async(req,res) =>{
     try {
         const result = await cloudinary.uploader.upload(req.file.path);
         
@@ -38,39 +38,55 @@ router.get("/allfood" , async(req,res) => {
     }
 })
 
-router.delete("/:_id" , async(req,res) => {
+router.delete("/:_id", [isAuth, isAdmin], async (req, res) => {
     try {
         let food = await Food.findById(req.params._id);
-        await cloudinary.uploader.destroy(food.cloudinary_id);
+        if (!food) {
+            return res.status(404).send({ msg: "food not found" })
+        }
+        if (food.cloudinary_id) {
+            await cloudinary.uploader.destroy(food.cloudinary_id);
+        }
         await food.deleteOne();
-        res.status(200).send({msg : "food deleted"})
+        res.status(200).send({ msg: "food deleted" })
     } catch (error) {
-        res.status(400).send({msg : "can not delete " , error})
+        res.status(400).send({ msg: "can not delete ", error })
     }
 })
 
-router.put("/:_id" ,upload.single("image"), async (req, res) => {
+router.put("/:_id", [isAuth, isAdmin], upload.single("image"), async (req, res) => {
     try {
         let food = await Food.findById(req.params._id);
-        await cloudinary.uploader.destroy(food.cloudinary_id);
-        const result = await cloudinary.uploader.upload(req.file.path);
+        if (!food) {
+            return res.status(404).send({ msg: "food not found" })
+        }
+
+        let result;
+        if (req.file) {
+            // If there's a new image, delete the old one first
+            if (food.cloudinary_id) {
+                await cloudinary.uploader.destroy(food.cloudinary_id);
+            }
+            // Upload new image
+            result = await cloudinary.uploader.upload(req.file.path);
+        }
 
         const data = {
             name: req.body.name || food.name,
             category: req.body.category || food.category,
             price: req.body.price || food.price,
-            profile_img: result.secure_url || food.profile_img,
-            cloudinary_id: result.public_id || food.cloudinary_id,
-          };
-          updatedFood = await Food.findByIdAndUpdate(req.params._id, data, {
-            new: true
-          });
-        res.status(200).send({msg : "food updated" , updatedFood})
-    } catch (error) {
-        res.status(400).send({msg : "can not update" , error})
+            profile_img: result ? result.secure_url : food.profile_img,
+            cloudinary_id: result ? result.public_id : food.cloudinary_id,
+        };
 
+        const updatedFood = await Food.findByIdAndUpdate(req.params._id, data, {
+            new: true
+        });
+        res.status(200).send({ msg: "food updated", updatedFood })
+    } catch (error) {
+        res.status(400).send({ msg: "can not update", error })
     }
-} )
+})
 
 router.get("/:_id" , async (req,res) => {
     try {

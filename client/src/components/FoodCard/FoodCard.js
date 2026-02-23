@@ -8,15 +8,15 @@ import Typography from '@mui/material/Typography';
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import {deleteFood } from "../../JS/Actions/food";
+import { deleteFood } from "../../JS/Actions/food";
 
-const FoodCard = ({food}) => {
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-    const isAdmin = useSelector(state => state.userReducer.isAdmin )
+const FoodCard = ({ food }) => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const isAdmin = useSelector(state => state.userReducer.isAdmin)
   return (
     <div>
-      <Card sx={{ maxWidth: 400 ,width : 300  ,mb:"6%"  }}>
+      <Card sx={{ maxWidth: 400, width: 300, mb: "6%" }}>
         <CardMedia
           sx={{ height: 140 }}
           image={food.profile_img}
@@ -27,19 +27,19 @@ const FoodCard = ({food}) => {
             {food.name}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-          Category :{food.category}
+            Category :{food.category}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-          Price :{food.price} $
-        </Typography>
+            Price :{food.price} $
+          </Typography>
         </CardContent>
         <CardActions>
-          <Button size="small" variant="contained" color="success" onClick={()=> navigate(`/EditFood/${food._id}`)} >Edit</Button>
-          {isAdmin === true ? 
-            <Button size="small" color="error" variant="contained" onClick={()=>dispatch(deleteFood(food._id))} >Delete <DeleteOutlineIcon sx={{color : "white"}}/> </Button> :
-            null
-          }
-          
+          {isAdmin === true ? (
+            <>
+              <Button size="small" variant="contained" color="success" onClick={() => navigate(`/EditFood/${food._id}`)}>Edit</Button>
+              <Button size="small" color="error" variant="contained" onClick={() => dispatch(deleteFood(food._id))}>Delete <DeleteOutlineIcon sx={{ color: "white" }} /></Button>
+            </>
+          ) : null}
         </CardActions>
       </Card>
     </div>
